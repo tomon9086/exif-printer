@@ -38,7 +38,7 @@ function onloadEvent() {
 }
 function drawText() {
 	ctx.fillStyle = colorobj.value
-	const fontsize = cvs.width * 0.015 | 0
+	const fontsize = cvs.width * 0.016 | 0
 	ctx.font = `${fontsize}px meiryo sans-serif`
 	ctx.fillText(exifstr, fontsize * 0.7, fontsize * 1.4)
 }
