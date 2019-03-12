@@ -3,22 +3,13 @@ const ctx = cvs.getContext("2d")
 const fileobj = document.querySelector("#file")
 const colorobj = document.querySelector("#color-picker")
 
-const img = new Image()
+let img = null
 let exifstr = ""
 let filename = ""
 
-img.onload = () => {
-	EXIF.getData(img, function() {
-		const data = EXIF.getAllTags(this)
-		console.log(data)
-		cvs.setAttribute("width", data.PixelXDimension)
-		cvs.setAttribute("height", data.PixelYDimension)
-		exifstr = `${data.Model} ${data.FocalLength}mm F${data.FNumber} ${data.ExposureTime.numerator}/${data.ExposureTime.denominator} ISO ${data.ISOSpeedRatings} Photo by ${data.Artist}`
-	})
-	ctx.drawImage(img, 0, 0)
-}
-
 fileobj.addEventListener("change", e => {
+	img = new Image()
+	img.onload = onloadEvent
 	const file = e.target.files[0]
 	const reader = new FileReader()
 	reader.readAsDataURL(file)
@@ -31,10 +22,21 @@ colorobj.addEventListener("change", e => {
 	drawText()
 }, false)
 
+function onloadEvent() {
+	EXIF.getData(img, function() {
+		const data = EXIF.getAllTags(this)
+		console.log(data)
+		cvs.setAttribute("width", data.PixelXDimension)
+		cvs.setAttribute("height", data.PixelYDimension)
+		exifstr = `${data.Model} ${data.FocalLength}mm F${data.FNumber} ${data.ExposureTime.numerator}/${data.ExposureTime.denominator} ISO ${data.ISOSpeedRatings} Photo by ${data.Artist}`
+	})
+	ctx.drawImage(img, 0, 0)
+}
 function drawText() {
 	ctx.fillStyle = colorobj.value
-	ctx.font = "80px meiryo"
-	ctx.fillText(exifstr, 100, 150)
+	const fontsize = cvs.width * 0.015 | 0
+	ctx.font = `${fontsize}px meiryo`
+	ctx.fillText(exifstr, fontsize * 0.7, fontsize * 1.4)
 }
 function download() {
 	// const link = document.createElement("a")
