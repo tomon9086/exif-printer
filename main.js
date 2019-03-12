@@ -30,7 +30,8 @@ function onloadEvent() {
 		cvs.setAttribute("height", data.PixelYDimension)
 		const artist = trim(data.Artist)
 		const photoby = artist ? `Photo by ${artist}` : ""
-		exifstr = `${trim(data.Model)} ${data.FocalLength}mm F${data.FNumber} ${data.ExposureTime.numerator}/${data.ExposureTime.denominator} ISO ${data.ISOSpeedRatings} ${photoby}`
+		const exposureTime = reduceFrac(data.ExposureTime.numerator, data.ExposureTime.denominator)
+		exifstr = `${trim(data.Model)}  ${data.FocalLength}mm  F${data.FNumber}  ${exposureTime}  ISO ${data.ISOSpeedRatings}  ${photoby}`
 	})
 	ctx.drawImage(img, 0, 0)
 }
@@ -72,4 +73,18 @@ function trim(str) {
 	for(let char of str.trim())
 		ret += char.charCodeAt() ? char : ""
 	return ret
+}
+function reduceFrac(numerator, denominator) {
+	numerator = +numerator
+	denominator = +denominator
+	if(isNaN(numerator) || isNaN(denominator))
+		return ""
+	if(denominator % numerator === 0) {
+		denominator /= numerator
+		numerator = 1
+	} else if(numerator % denominator === 0) {
+		numerator /= denominator
+		denominator = 1
+	}
+	return `${numerator}/${denominator}`
 }
