@@ -28,9 +28,10 @@ function onloadEvent() {
 		console.log(data)
 		cvs.setAttribute("width", data.PixelXDimension)
 		cvs.setAttribute("height", data.PixelYDimension)
+		cvs.style.height = cvs.clientWidth * data.PixelYDimension / data.PixelXDimension
 		const artist = trim(data.Artist)
 		const photoby = artist ? `Photo by ${artist}` : ""
-		const exposureTime = reduceFrac(data.ExposureTime.numerator, data.ExposureTime.denominator)
+		const exposureTime = data.ExposureTime && reduceFrac(data.ExposureTime.numerator, data.ExposureTime.denominator)
 		exifstr = `${trim(data.Model)}  ${data.FocalLength}mm  F${data.FNumber}  ${exposureTime}  ISO ${data.ISOSpeedRatings}  ${photoby}`
 	})
 	ctx.drawImage(img, 0, 0)
@@ -38,7 +39,7 @@ function onloadEvent() {
 function drawText() {
 	ctx.fillStyle = colorobj.value
 	const fontsize = cvs.width * 0.015 | 0
-	ctx.font = `${fontsize}px meiryo`
+	ctx.font = `${fontsize}px meiryo sans-serif`
 	ctx.fillText(exifstr, fontsize * 0.7, fontsize * 1.4)
 }
 function download() {
