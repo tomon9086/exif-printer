@@ -28,7 +28,9 @@ function onloadEvent() {
 		console.log(data)
 		cvs.setAttribute("width", data.PixelXDimension)
 		cvs.setAttribute("height", data.PixelYDimension)
-		exifstr = `${data.Model} ${data.FocalLength}mm F${data.FNumber} ${data.ExposureTime.numerator}/${data.ExposureTime.denominator} ISO ${data.ISOSpeedRatings} Photo by ${data.Artist}`
+		const artist = trim(data.Artist)
+		const photoby = artist ? `Photo by ${artist}` : ""
+		exifstr = `${trim(data.Model)} ${data.FocalLength}mm F${data.FNumber} ${data.ExposureTime.numerator}/${data.ExposureTime.denominator} ISO ${data.ISOSpeedRatings} ${photoby}`
 	})
 	ctx.drawImage(img, 0, 0)
 }
@@ -62,4 +64,12 @@ function download() {
 		link.download = filename || "canvas.jpg"
 		link.click()
 	}, "image/jpeg")
+}
+function trim(str) {
+	if(!str)
+		return ""
+	let ret = ""
+	for(let char of str.trim())
+		ret += char.charCodeAt() ? char : ""
+	return ret
 }
