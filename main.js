@@ -2,6 +2,7 @@ const cvs = document.querySelector("#canvas")
 const ctx = cvs.getContext("2d")
 const fileobj = document.querySelector("#file")
 const colorobj = document.querySelector("#color-picker")
+const loading = document.querySelector("#loading-wrapper")
 
 const imgRegex = /^image\/.+/
 
@@ -10,6 +11,7 @@ let exifstr = ""
 let filename = ""
 
 fileobj.addEventListener("change", e => {
+	loading.style.display = "unset"
 	img = new Image()
 	img.onload = onloadEvent
 	const file = e.target.files[0]
@@ -30,6 +32,7 @@ colorobj.addEventListener("change", e => {
 }, false)
 
 function onloadEvent() {
+	loading.style.display = "none"
 	EXIF.getData(img, function() {
 		const data = EXIF.getAllTags(this)
 		console.log(data)
