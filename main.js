@@ -3,6 +3,8 @@ const ctx = cvs.getContext("2d")
 const fileobj = document.querySelector("#file")
 const colorobj = document.querySelector("#color-picker")
 
+const imgRegex = /^image\/.+/
+
 let img = null
 let exifstr = ""
 let filename = ""
@@ -11,6 +13,11 @@ fileobj.addEventListener("change", e => {
 	img = new Image()
 	img.onload = onloadEvent
 	const file = e.target.files[0]
+	// console.log(file.type)
+	if(!file.type.match(imgRegex)) {
+		alert(`This file is not a image.`)
+		return
+	}
 	const reader = new FileReader()
 	reader.readAsDataURL(file)
 	reader.onload = () => {
@@ -26,9 +33,13 @@ function onloadEvent() {
 	EXIF.getData(img, function() {
 		const data = EXIF.getAllTags(this)
 		console.log(data)
-		cvs.setAttribute("width", data.PixelXDimension)
-		cvs.setAttribute("height", data.PixelYDimension)
-		cvs.style.height = cvs.clientWidth * data.PixelYDimension / data.PixelXDimension
+		const imgsize = {
+			width: img.naturalWidth,
+			height: img.naturalHeight
+		}
+		cvs.setAttribute("width", imgsize.width)
+		cvs.setAttribute("height", imgsize.height)
+		cvs.style.height = cvs.clientWidth * imgsize.height / imgsize.width
 		exifstr = ""
 		const model = trim(data.Model) || ""
 		exifstr += model ? `${model}  ` : ""
@@ -50,6 +61,10 @@ function drawText() {
 	ctx.fillStyle = colorobj.value
 	const fontsize = cvs.width * 0.016 | 0
 	ctx.font = `${fontsize}px 'meiryo', 'Hiragino Kaku Gothic Pro', 'sans-serif'`
+	if(!exifstr) {
+		alert(`This image contains no available metadata.`)
+		return
+	}
 	ctx.fillText(exifstr, fontsize * 0.7, fontsize * 1.4)
 }
 function download() {
