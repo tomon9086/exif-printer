@@ -18,6 +18,7 @@ fileobj.addEventListener("change", e => {
 	// console.log(file.type)
 	if(!file.type.match(imgRegex)) {
 		alert(`This file is not a image.`)
+		loading.style.display = "none"
 		return
 	}
 	const reader = new FileReader()
