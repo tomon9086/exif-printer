@@ -29,10 +29,20 @@ function onloadEvent() {
 		cvs.setAttribute("width", data.PixelXDimension)
 		cvs.setAttribute("height", data.PixelYDimension)
 		cvs.style.height = cvs.clientWidth * data.PixelYDimension / data.PixelXDimension
+		exifstr = ""
+		const model = trim(data.Model) || ""
+		exifstr += model ? `${model}  ` : ""
+		const focalLength = data.FocalLength ? `${data.FocalLength}mm` : ""
+		exifstr += focalLength ? `${focalLength}  ` : ""
+		const FNumber = data.FNumber ? `F${data.FNumber}` : ""
+		exifstr += FNumber ? `${FNumber}  ` : ""
+		const exposureTime = data.ExposureTime ? reduceFrac(data.ExposureTime.numerator, data.ExposureTime.denominator) : ""
+		exifstr += exposureTime ? `${exposureTime}  ` : ""
+		const iso = data.ISOSpeedRatings ? `ISO ${data.ISOSpeedRatings}` : ""
+		exifstr += iso ? `${iso}  ` : ""
 		const artist = trim(data.Artist)
 		const photoby = artist ? `Photo by ${artist}` : ""
-		const exposureTime = data.ExposureTime && reduceFrac(data.ExposureTime.numerator, data.ExposureTime.denominator)
-		exifstr = `${trim(data.Model)}  ${data.FocalLength}mm  F${data.FNumber}  ${exposureTime}  ISO ${data.ISOSpeedRatings}  ${photoby}`
+		exifstr += photoby || ""
 	})
 	ctx.drawImage(img, 0, 0)
 }
