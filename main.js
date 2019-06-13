@@ -11,7 +11,7 @@ const textPos = {
 	y: 0
 }
 let img = null
-let exifstr = "hogehogehgoheoghegohegoeho"
+let exifstr = ""
 let filename = ""
 
 fileobj.addEventListener("change", e => {
