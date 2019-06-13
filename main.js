@@ -6,8 +6,12 @@ const loading = document.querySelector("#loading-wrapper")
 
 const imgRegex = /^image\/.+/
 
+const textPos = {
+	x: 0,
+	y: 0
+}
 let img = null
-let exifstr = ""
+let exifstr = "hogehogehgoheoghegohegoeho"
 let filename = ""
 
 fileobj.addEventListener("change", e => {
@@ -61,15 +65,19 @@ function onloadEvent() {
 	})
 	ctx.drawImage(img, 0, 0)
 }
+function clearText() {
+	ctx.clearRect(0, 0, cvs.width, cvs.height)
+	if(img)
+		ctx.drawImage(img, 0, 0)
+}
 function drawText() {
 	ctx.fillStyle = colorobj.value
-	const fontsize = cvs.width * 0.016 | 0
-	ctx.font = `${fontsize}px 'meiryo', 'Hiragino Kaku Gothic Pro', 'sans-serif'`
+	ctx.font = `${fontsize()}px 'meiryo', 'Hiragino Kaku Gothic Pro', 'sans-serif'`
 	if(!exifstr) {
 		alert(`This image contains no available metadata.`)
 		return
 	}
-	ctx.fillText(exifstr, fontsize * 0.7, fontsize * 1.4)
+	ctx.fillText(exifstr, textPos.x, textPos.y)
 }
 function download() {
 	// const link = document.createElement("a")
@@ -96,6 +104,37 @@ function download() {
 		link.click()
 	}, "image/jpeg")
 }
+function setCorner(n) {
+	clearText()
+	const fs = fontsize()
+	const textMetrix = ctx.measureText(exifstr)
+	const textWidth = textMetrix ? textMetrix.width : 0
+	const offset = {
+		x: fs * 0.7,
+		y: fs * 1.4
+	}
+	switch(n) {
+		case 0:
+			textPos.x = offset.x
+			textPos.y = offset.y
+			break
+		case 1:
+			textPos.x = cvs.width - textWidth - offset.x
+			textPos.y = offset.y
+			break
+		case 2:
+			textPos.x = offset.x
+			textPos.y = cvs.height - offset.y + fs
+			break
+		case 3:
+			textPos.x = cvs.width - textWidth - offset.x
+			textPos.y = cvs.height - offset.y + fs
+			break
+		default:
+			break
+	}
+	drawText()
+}
 function trim(str) {
 	if(!str)
 		return ""
@@ -117,4 +156,7 @@ function reduceFrac(numerator, denominator) {
 		denominator = 1
 	}
 	return `${numerator}/${denominator}`
+}
+function fontsize() {
+	return cvs.width * 0.016 | 0
 }
