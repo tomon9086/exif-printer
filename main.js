@@ -13,6 +13,7 @@ const textPos = {
 let img = null
 let exifstr = ""
 let filename = ""
+let corner = 0
 
 fileobj.addEventListener("change", e => {
 	loading.style.display = "unset"
@@ -20,6 +21,8 @@ fileobj.addEventListener("change", e => {
 	img.onload = onloadEvent
 	const file = e.target.files[0]
 	// console.log(file.type)
+	if(!file)
+		return
 	if(!file.type.match(imgRegex)) {
 		alert(`This file is not a image.`)
 		loading.style.display = "none"
@@ -48,12 +51,14 @@ function onloadEvent() {
 		cvs.setAttribute("width", imgsize.width)
 		cvs.setAttribute("height", imgsize.height)
 		cvs.style.height = cvs.clientWidth * imgsize.height / imgsize.width
+		if(!Object.keys(data).length)
+			return
 		exifstr = ""
 		const model = trim(data.Model) || ""
 		exifstr += model ? `${model}  ` : ""
-		const focalLength = data.FocalLength ? `${data.FocalLength}mm` : ""
+		const focalLength = +data.FocalLength ? `${data.FocalLength}mm` : "––mm"
 		exifstr += focalLength ? `${focalLength}  ` : ""
-		const FNumber = data.FNumber ? `F${data.FNumber}` : ""
+		const FNumber = +data.FNumber ? `F${data.FNumber}` : "F––"
 		exifstr += FNumber ? `${FNumber}  ` : ""
 		const exposureTime = data.ExposureTime ? reduceFrac(data.ExposureTime.numerator, data.ExposureTime.denominator) : ""
 		exifstr += exposureTime ? `${exposureTime}  ` : ""
@@ -64,6 +69,7 @@ function onloadEvent() {
 		exifstr += photoby || ""
 	})
 	ctx.drawImage(img, 0, 0)
+	drawText()
 }
 function clearText() {
 	ctx.clearRect(0, 0, cvs.width, cvs.height)
@@ -77,9 +83,14 @@ function drawText() {
 		alert(`This image contains no available metadata.`)
 		return
 	}
+	setTextPos(corner)
 	ctx.fillText(exifstr, textPos.x, textPos.y)
 }
 function download() {
+	if(!img) {
+		alert("Image is not imported.")
+		return
+	}
 	// const link = document.createElement("a")
 	const linkcontainer = document.querySelector("#download-container")
 	// for(let node of linkcontainer.childNodes) {
@@ -105,7 +116,11 @@ function download() {
 	}, "image/jpeg")
 }
 function setCorner(n) {
+	corner = n
 	clearText()
+	drawText()
+}
+function setTextPos(n) {
 	const fs = fontsize()
 	const textMetrix = ctx.measureText(exifstr)
 	const textWidth = textMetrix ? textMetrix.width : 0
@@ -133,7 +148,6 @@ function setCorner(n) {
 		default:
 			break
 	}
-	drawText()
 }
 function trim(str) {
 	if(!str)
